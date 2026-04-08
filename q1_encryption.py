@@ -1,25 +1,46 @@
 # Function to encrypt the text
 def encrypt(text, shift1, shift2):
-    result = ""  # store encrypted text
+    result = ""  # this will store encrypted text
 
-    # loop through each character
+    # go through each character in the text
     for char in text:
-        if char.islower():  # check if lowercase letter
 
+        # check if character is lowercase
+        if char.islower():
+
+            # if between a and m
             if char >= 'a' and char <= 'm':
                 # move forward by shift1 * shift2
                 shift = shift1 * shift2
                 new_char = chr((ord(char) - ord('a') + shift) % 26 + ord('a'))
                 result += new_char
 
+            # if between n and z
             elif char >= 'n' and char <= 'z':
                 # move backward by shift1 + shift2
                 shift = shift1 + shift2
                 new_char = chr((ord(char) - ord('a') - shift) % 26 + ord('a'))
                 result += new_char
 
+        # check if character is uppercase
+        elif char.isupper():
+
+            # if between A and M
+            if char >= 'A' and char <= 'M':
+                # move backward by shift1
+                shift = shift1
+                new_char = chr((ord(char) - ord('A') - shift) % 26 + ord('A'))
+                result += new_char
+
+            # if between N and Z
+            elif char >= 'N' and char <= 'Z':
+                # move forward by shift2 squared
+                shift = shift2 * shift2
+                new_char = chr((ord(char) - ord('A') + shift) % 26 + ord('A'))
+                result += new_char
+
         else:
-            # keep non-lowercase characters unchanged
+            # if not a letter, keep it same
             result += char
 
     return result
