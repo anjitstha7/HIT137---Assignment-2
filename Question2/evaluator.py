@@ -161,3 +161,11 @@ def format_tree(node):
         left  = node[2]
         right = node[3]
         return "(" + op + " " + format_tree(left) + " " + format_tree(right) + ")"
+    
+# ---------------- RESULT FORMAT ---------------- #
+
+def format_result(value):
+    if float(value).is_integer():
+        return str(int(value))
+    else:
+        return str(round(value, 4))
