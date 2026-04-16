@@ -169,3 +169,85 @@ def format_result(value):
         return str(int(value))
     else:
         return str(round(value, 4))
+    
+# ---------------- MAIN FUNCTION ---------------- #
+
+def evaluate_file(input_path: str) -> list[dict]:
+    results = []
+    output_path = os.path.join(os.path.dirname(os.path.abspath(input_path)), "output.txt")
+
+    with open(input_path, "r") as f:
+        lines = f.readlines()
+
+    with open(output_path, "w") as out:
+        for line in lines:
+            expr = line.rstrip("\n")
+
+            if expr.strip() == "":
+                continue
+
+            tree_str   = "ERROR"
+            token_str  = "ERROR"
+            result_str = "ERROR"
+            result_val = "ERROR"
+
+            # Step 1: tokenise and parse
+            try:
+                token_list = tokenize(expr)
+
+                if token_list is None:
+                    raise ValueError("Unknown character in expression")
+
+                tree      = parse(token_list)
+                tree_str  = format_tree(tree)
+                token_str = format_tokens(token_list)
+
+            except Exception:
+                out.write("Input: "  + expr       + "\n")
+                out.write("Tree: "   + tree_str   + "\n")
+                out.write("Tokens: " + token_str  + "\n")
+                out.write("Result: " + result_str + "\n\n")
+                results.append({"input": expr, "tree": tree_str, "tokens": token_str, "result": result_val})
+                continue
+
+            # Step 2: evaluate (tree already saved, only result becomes ERROR on failure)
+            try:
+                value      = evaluate(tree)
+                result_str = format_result(value)
+                result_val = float(value)
+
+            except Exception:
+                result_str = "ERROR"
+                result_val = "ERROR"
+
+            out.write("Input: "  + expr       + "\n")
+            out.write("Tree: "   + tree_str   + "\n")
+            out.write("Tokens: " + token_str  + "\n")
+            out.write("Result: " + result_str + "\n\n")
+
+            results.append({"input": expr, "tree": tree_str, "tokens": token_str, "result": result_val})
+
+    return results
+
+
+# ---------------- RUN DIRECTLY FOR TESTING ---------------- #
+
+if _name_ == "_main_":
+    import sys
+
+    input_file = sys.argv[1] if len(sys.argv) > 1 else "sample_input.txt"
+
+    print("=" * 50)
+    print("=" * 50)
+    print("  Reading: " + input_file)
+    print()
+
+    results = evaluate_file(input_file)
+
+    for r in results:
+        val_str = "ERROR" if r["result"] == "ERROR" else format_result(r["result"])
+        print("Input  : " + r["input"])
+        print("Tree   : " + r["tree"])
+        print("Tokens : " + r["tokens"])
+        print("Result : " + val_str)
+        print()
