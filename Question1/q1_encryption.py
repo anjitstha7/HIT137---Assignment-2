@@ -1,91 +1,132 @@
-# Function to encrypt the text
-def encrypt(text, shift1, shift2):
-    result = ""  # this will store encrypted text
+# Function to shift a character inside its own group
+def shift_within_group(char, group_start, group_size, shift, forward=True):
+    # find the position of the character inside the group
+    offset = ord(char) - ord(group_start)
+
+    # move forward or backward inside the group
+    if forward:
+        new_offset = (offset + shift) % group_size
+    else:
+        new_offset = (offset - shift) % group_size
+
+    # convert back to a character
+    return chr(ord(group_start) + new_offset)
+
+
+# Function to encrypt one character
+def encrypt_char(char, shift1, shift2):
+
+    # lowercase a-m
+    if 'a' <= char <= 'm':
+        return shift_within_group(char, 'a', 13, shift1 * shift2, forward=True)
+
+    # lowercase n-z
+    elif 'n' <= char <= 'z':
+        return shift_within_group(char, 'n', 13, shift1 + shift2, forward=False)
+
+    # uppercase A-M
+    elif 'A' <= char <= 'M':
+        return shift_within_group(char, 'A', 13, shift1, forward=False)
+
+    # uppercase N-Z
+    elif 'N' <= char <= 'Z':
+        return shift_within_group(char, 'N', 13, shift2 * shift2, forward=True)
+
+    # other characters stay the same
+    return char
+
+
+# Function to decrypt one character
+def decrypt_char(char, shift1, shift2):
+
+    # lowercase a-m
+    if 'a' <= char <= 'm':
+        return shift_within_group(char, 'a', 13, shift1 * shift2, forward=False)
+
+    # lowercase n-z
+    elif 'n' <= char <= 'z':
+        return shift_within_group(char, 'n', 13, shift1 + shift2, forward=True)
+
+    # uppercase A-M
+    elif 'A' <= char <= 'M':
+        return shift_within_group(char, 'A', 13, shift1, forward=True)
+
+    # uppercase N-Z
+    elif 'N' <= char <= 'Z':
+        return shift_within_group(char, 'N', 13, shift2 * shift2, forward=False)
+
+    # other characters stay the same
+    return char
+
+
+# Function to process the whole text
+def transform_text(text, shift1, shift2, encrypt=True):
+    result = ""
 
     # go through each character in the text
     for char in text:
-
-        # check if character is lowercase
-        if char.islower():
-
-            # if between a and m
-            if char >= 'a' and char <= 'm':
-                # move forward by shift1 * shift2
-                shift = shift1 * shift2
-                new_char = chr((ord(char) - ord('a') + shift) % 26 + ord('a'))
-                result += new_char
-
-            # if between n and z
-            elif char >= 'n' and char <= 'z':
-                # move backward by shift1 + shift2
-                shift = shift1 + shift2
-                new_char = chr((ord(char) - ord('a') - shift) % 26 + ord('a'))
-                result += new_char
-
-        # check if character is uppercase
-        elif char.isupper():
-
-            # if between A and M
-            if char >= 'A' and char <= 'M':
-                # move backward by shift1
-                shift = shift1
-                new_char = chr((ord(char) - ord('A') - shift) % 26 + ord('A'))
-                result += new_char
-
-            # if between N and Z
-            elif char >= 'N' and char <= 'Z':
-                # move forward by shift2 squared
-                shift = shift2 * shift2
-                new_char = chr((ord(char) - ord('A') + shift) % 26 + ord('A'))
-                result += new_char
-
+        if encrypt:
+            # encrypt each character
+            result += encrypt_char(char, shift1, shift2)
         else:
-            # if not a letter, keep it same
-            result += char
+            # decrypt each character
+            result += decrypt_char(char, shift1, shift2)
 
     return result
 
 
-# Function to decrypt the text (logic will be added later)
-def decrypt(text, shift1, shift2):
-    return text
-
-
-# Function to verify if original and decrypted text are the same
-def verify(original_text, decrypted_text):
-    return original_text == decrypted_text
-
-
-# Main function to control the program flow
-def main():
-    # take input values from user
-    shift1 = int(input("Enter shift1: "))
-    shift2 = int(input("Enter shift2: "))
-
-    # read text from file
+# Function to encrypt the file
+def encrypt_file(shift1, shift2):
     with open("raw_text.txt", "r", encoding="utf-8") as file:
         original_text = file.read()
 
-    # encrypt the text
-    encrypted_text = encrypt(original_text, shift1, shift2)
+    encrypted_text = transform_text(original_text, shift1, shift2, encrypt=True)
 
-    # save encrypted text into file
     with open("encrypted_text.txt", "w", encoding="utf-8") as file:
         file.write(encrypted_text)
 
-    # decrypt the text
-    decrypted_text = decrypt(encrypted_text, shift1, shift2)
 
-    # save decrypted text into file
+# Function to decrypt the file
+def decrypt_file(shift1, shift2):
+    with open("encrypted_text.txt", "r", encoding="utf-8") as file:
+        encrypted_text = file.read()
+
+    decrypted_text = transform_text(encrypted_text, shift1, shift2, encrypt=False)
+
     with open("decrypted_text.txt", "w", encoding="utf-8") as file:
         file.write(decrypted_text)
 
-    # check if decryption is correct
-    if verify(original_text, decrypted_text):
+
+# Function to verify the result
+def verify_decryption():
+    with open("raw_text.txt", "r", encoding="utf-8") as file:
+        original_text = file.read()
+
+    with open("decrypted_text.txt", "r", encoding="utf-8") as file:
+        decrypted_text = file.read()
+
+    if original_text == decrypted_text:
         print("Verification successful: decrypted text matches original text.")
     else:
         print("Verification failed: decrypted text does not match original text.")
 
 
-# run the program
-main()
+# Main function
+def main():
+    # take shift values from user
+    shift1 = int(input("Enter shift1: "))
+    shift2 = int(input("Enter shift2: "))
+
+    # encrypt the original file
+    encrypt_file(shift1, shift2)
+
+    # decrypt the encrypted file
+    decrypt_file(shift1, shift2)
+
+    # check whether original and decrypted texts match
+    verify_decryption()
+
+
+# Run the program
+if __name__ == "__main__":
+    main()
