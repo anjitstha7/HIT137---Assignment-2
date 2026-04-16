@@ -1,0 +1,35 @@
+Input: 3 + 5
+Tree: (+ 3 5)
+Tokens: 3 + 5
+Result: 8
+
+Input: 2 + 3 * 4
+Tree: (+ 2 (* 3 4))
+Tokens: 2 + 3 * 4
+Result: 14
+
+Input: -(3 + 4)
+Tree: (neg (+ 3 4))
+Tokens: - ( 3 + 4 )
+Result: -7
+
+Input: --5
+Tree: (neg (neg 5))
+Tokens: - - 5
+Result: 5
+
+Input: (10 - 2) * 3 + -4 / 2
+Tree: (+ (* (- 10 2) 3) (/ (neg 4) 2))
+Tokens: ( 10 - 2 ) * 3 + - 4 / 2
+Result: 22
+
+Input: 3 @ 5
+Tree: ERROR
+Tokens: ERROR
+Result: ERROR
+
+Input: 1 / 0
+Tree: (/ 1 0)
+Tokens: 1 / 0
+Result: ERROR
+

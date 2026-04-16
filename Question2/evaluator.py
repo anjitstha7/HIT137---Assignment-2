@@ -162,6 +162,16 @@ def format_tree(node):
         right = node[3]
         return "(" + op + " " + format_tree(left) + " " + format_tree(right) + ")"
     
+# ---------------- TOKEN FORMAT ---------------- #
+
+def format_tokens(token_list):
+    parts = []
+    for tok_type, tok_val in token_list:
+        if tok_type == "END":
+            continue
+        parts.append(tok_val)
+    return " ".join(parts)
+
 # ---------------- RESULT FORMAT ---------------- #
 
 def format_result(value):
@@ -232,10 +242,12 @@ def evaluate_file(input_path: str) -> list[dict]:
 
 # ---------------- RUN DIRECTLY FOR TESTING ---------------- #
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     import sys
+    import os
 
-    input_file = sys.argv[1] if len(sys.argv) > 1 else "sample_input.txt"
+    _script_dir = os.path.dirname(os.path.abspath(__file__))
+    input_file = sys.argv[1] if len(sys.argv) > 1 else os.path.join(_script_dir, "sample_input.txt")
 
     print("=" * 50)
     print("=" * 50)
