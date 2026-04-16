@@ -117,3 +117,47 @@ def parse(tokens):
         raise ValueError("Extra tokens after expression")
 
     return tree
+
+# ---------------- EVALUATOR ---------------- #
+
+def evaluate(node):
+    if node[0] == "num":
+        return float(node[1])
+
+    elif node[0] == "neg":
+        return -evaluate(node[1])
+
+    elif node[0] == "bin":
+        op    = node[1]
+        left  = node[2]
+        right = node[3]
+        l = evaluate(left)
+        r = evaluate(right)
+
+        if op == "+":
+            return l + r
+        elif op == "-":
+            return l - r
+        elif op == "*":
+            return l * r
+        elif op == "/":
+            if r == 0:
+                raise ZeroDivisionError("Division by zero")
+            return l / r
+
+
+# ---------------- TREE FORMAT ---------------- #
+
+def format_tree(node):
+    if node[0] == "num":
+        val = float(node[1])
+        return str(int(val)) if val.is_integer() else str(round(val, 4))
+
+    elif node[0] == "neg":
+        return "(neg " + format_tree(node[1]) + ")"
+
+    elif node[0] == "bin":
+        op    = node[1]
+        left  = node[2]
+        right = node[3]
+        return "(" + op + " " + format_tree(left) + " " + format_tree(right) + ")"
